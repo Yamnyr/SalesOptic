@@ -1,5 +1,7 @@
 # Big Data Project - Data Pipeline & Visualization
 
+[Lien vers la présentation du projet](https://architecture-big-data-8tn5u4d.gamma.site/)
+
 Ce projet est une démonstration d'un pipeline Big Data complet, de la génération de données brutes à leur visualisation finale via un dashboard interactif. Il utilise l'architecture Medallion (Bronze, Silver, Gold) avec Apache Spark pour le traitement.
 
 ## Scénario
