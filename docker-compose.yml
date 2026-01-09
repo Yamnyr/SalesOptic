@@ -1,0 +1,59 @@
+services:
+  # 1. Générateur de données (s'arrête après exécution)
+  data-gen:
+    image: python:3.10-slim
+    container_name: data-gen
+    volumes:
+      - ./data:/data
+    working_dir: /data
+    command: python generate_data.py
+
+  # 2. Base de données relationnelle
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_DB: bigdata
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    volumes:
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d bigdata"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # 3. Moteur de traitement Spark (automatisé)
+  spark:
+    image: apache/spark:3.5.1
+    container_name: spark
+    depends_on:
+      data-gen:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./data:/data
+      - ./spark:/spark
+      - ./ingestion:/ingestion
+    user: root
+    command: >
+      bash -c "chmod +x /spark/run_pipeline_docker.sh &&
+               /spark/run_pipeline_docker.sh &&
+               tail -f /dev/null"
+
+  # 4. Interface de visualisation
+  streamlit:
+    build: 
+      context: ./streamlit
+    container_name: streamlit
+    volumes:
+      - ./streamlit:/app
+      - ./data:/data
+    ports:
+      - "8501:8501"
+    depends_on:
+      - spark
