@@ -1,23 +1,2 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
-
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-
-# IDEs
-.idea/
-.vscode/
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Project specific
 data/*
-*.log
+!data/generate_data.py
